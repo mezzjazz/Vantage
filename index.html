@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vantage — Customer Revenue & Operations Workspace</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        dark: {
+                            bg: '#090d16',
+                            card: '#111726',
+                            border: '#1f293d',
+                            muted: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Custom Scrollbar & Glassmorphism Utilities */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+        
+        .glass-panel {
+            background: rgba(17, 23, 38, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .light .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .kanban-col {
+            min-height: calc(100vh - 280px);
+        }
+
+        /* Smooth View Fade Transitions */
+        .view-content {
+            animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Pulse Dot Animation */
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+        }
+        .status-pulse {
+            animation: statusPulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="flex flex-1 min-h-screen relative overflow-hidden">
+        
+        <!-- SIDEBAR (DESKTOP) -->
+        <aside id="sidebar" class="hidden md:flex flex-col w-64 bg-dark-card border-r border-dark-border z-30 transition-all duration-300 select-none shrink-0">
+            <!-- Workspace Header -->
+            <div class="h-16 flex items-center justify-between px-5 border-b border-dark-border">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-brand-500/20">
+                        V
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm tracking-tight text-white">Vantage Ops</span>
+                        <span class="text-[11px] text-slate-400 font-mono">Enterprise B2B</span>
+                    </div>
+                </div>
+                <button id="collapse-sidebar-btn" class="text-slate-400 hover:text-white p-1 rounded-md hover:bg-slate-800/60 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                </button>
+            </div>
+
+            <!-- Main Navigation Links -->
+            <nav class="flex-1 px-3 py-4 space-y-1">
+                <div class="px-3 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Workspace</div>
+                
+                <a href="#overview" data-view="overview" class="nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-white bg-brand-600/10 text-brand-400 border border-brand-500/20">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        <span>Overview</span>
+                    </div>
+                    <span class="text-[10px] font-mono bg-brand-500/20 text-brand-300 px-1.5 py-0.5 rounded">Live</span>
+                </a>
+
+                <a href="#customers" data-view="customers" class="nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        <span>Customers & Revenue</span>
+                    </div>
+                    <span id="nav-customer-count" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">14</span>
+                </a>
+
+                <a href="#tasks" data-view="tasks" class="nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        <span>Projects & Kanban</span>
+                    </div>
+                    <span id="nav-task-count" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">8</span>
+                </a>
+
+                <a href="#billing" data-view="billing" class="nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <span>Billing & Plans</span>
+                    </div>
+                </a>
+
+                <div class="pt-4 px-3 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">System</div>
+
+                <a href="#settings" data-view="settings" class="nav-link flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>Settings & Team</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar User Profile Footer -->
+            <div class="p-4 border-t border-dark-border flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <img class="w-8 h-8 rounded-full border border-brand-500/40 object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar">
+                    <div class="flex flex-col truncate">
+                        <span class="text-xs font-semibold text-white truncate">Elena Rostova</span>
+                        <span class="text-[10px] text-slate-400 truncate">Head of Ops</span>
+                    </div>
+                </div>
+                <button id="quick-theme-toggle" title="Toggle Theme" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN LAYOUT AREA -->
+        <div class="flex-1 flex flex-col min-w-0 bg-dark-bg overflow-y-auto">
+            
+            <!-- TOP NAVBAR -->
+            <header class="h-16 border-b border-dark-border bg-dark-card/60 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between px-4 md:px-6">
+                <!-- Left Mobile Menu Trigger & Search Trigger -->
+                <div class="flex items-center space-x-3">
+                    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    
+                    <!-- Command Palette Button Trigger -->
+                    <button id="cmd-k-trigger" class="flex items-center space-x-2 bg-slate-900/80 hover:bg-slate-800 border border-dark-border px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-slate-200 transition min-w-[200px] md:min-w-[260px] justify-between">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <span>Quick search customers, tasks...</span>
+                        </div>
+                        <kbd class="hidden sm:inline-block bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-[10px] text-slate-400 font-mono">⌘K</kbd>
+                    </button>
+                </div>
+
+                <!-- Right Header Controls -->
+                <div class="flex items-center space-x-3">
+                    <!-- Quick New Action Button Dropdown -->
+                    <div class="relative group">
+                        <button class="bg-brand-600 hover:bg-brand-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1.5 shadow-md shadow-brand-600/20 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <span>New Item</span>
+                        </button>
+                        <div class="absolute right-0 mt-1 w-44 bg-dark-card border border-dark-border rounded-xl shadow-xl py-1 hidden group-hover:block z-50">
+                            <button id="btn-modal-add-customer" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-brand-600 hover:text-white flex items-center space-x-2 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                                <span>Add Customer</span>
+                            </button>
+                            <button id="btn-modal-add-task" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-brand-600 hover:text-white flex items-center space-x-2 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Create Task</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Indicator -->
+                    <div class="hidden sm:flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 status-pulse"></span>
+                        <span class="text-[11px] font-medium text-emerald-400">System Healthy</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- DYNAMIC VIEW CONTAINER -->
+            <main class="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
+                
+                <!-- 1. OVERVIEW VIEW -->
+                <section id="view-overview" class="view-content space-y-6">
+                    <!-- Page Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Executive Dashboard</h1>
+                            <p class="text-xs md:text-sm text-slate-400">Real-time revenue metrics, active workspaces, and churn risk monitoring.</p>
+                        </div>
+                        <!-- Timeframe selector -->
+                        <div class="flex items-center bg-slate-900 border border-dark-border p-1 rounded-lg text-xs font-medium self-start sm:self-auto">
+                            <button data-tf="7d" class="tf-btn px-3 py-1 rounded-md text-slate-400 hover:text-white">7 Days</button>
+                            <button data-tf="30d" class="tf-btn px-3 py-1 rounded-md text-white bg-brand-600 font-semibold shadow">30 Days</button>
+                            <button data-tf="12m" class="tf-btn px-3 py-1 rounded-md text-slate-400 hover:text-white">12 Months</button>
+                        </div>
+                    </div>
+
+                    <!-- KPI Metric Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- KPI 1 -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-5 hover:border-slate-700 transition shadow-sm">
+                            <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+                                <span>Annual Recurring Revenue</span>
+                                <span class="p-1.5 rounded-lg bg-brand-500/10 text-brand-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <div class="text-2xl font-bold text-white font-mono tracking-tight" id="kpi-arr">$4,284,500</div>
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center">
+                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    +14.2%
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-2">vs. previous period ($3.75M)</p>
+                        </div>
+
+                        <!-- KPI 2 -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-5 hover:border-slate-700 transition shadow-sm">
+                            <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+                                <span>Net Revenue Retention</span>
+                                <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/></svg>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <div class="text-2xl font-bold text-white font-mono tracking-tight">118.4%</div>
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center">
+                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    +2.1%
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-2">Target benchmark &gt;115%</p>
+                        </div>
+
+                        <!-- KPI 3 -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-5 hover:border-slate-700 transition shadow-sm">
+                            <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+                                <span>Active Workspaces</span>
+                                <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m3 0h1m-4-5l1.586-1.586a2 2 0 012.828 0L15 17m-6 0l-2-2m0 0l-1.586 1.586a2 2 0 000 2.828L7 20"/></svg>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <div class="text-2xl font-bold text-white font-mono tracking-tight" id="kpi-workspaces">1,420</div>
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center">
+                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    +8.5%
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-2">86 Enterprise accounts</p>
+                        </div>
+
+                        <!-- KPI 4 -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-5 hover:border-slate-700 transition shadow-sm">
+                            <div class="flex items-center justify-between text-slate-400 text-xs font-medium">
+                                <span>Avg. Resolution Time</span>
+                                <span class="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline justify-between">
+                                <div class="text-2xl font-bold text-white font-mono tracking-tight">1.4 hrs</div>
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center">
+                                    <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+                                    -18% faster
+                                </span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-2">SLA target: &lt; 2.0 hrs</p>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Growth Chart & Side Activity Feed Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <!-- Revenue Canvas Chart -->
+                        <div class="lg:col-span-2 bg-dark-card border border-dark-border rounded-xl p-5 flex flex-col justify-between shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-white">Revenue & Expansion Growth</h3>
+                                    <p class="text-xs text-slate-400">Monthly Recurring Revenue (MRR) trajectory in USD</p>
+                                </div>
+                                <div class="flex items-center space-x-3 text-xs">
+                                    <span class="flex items-center text-slate-300">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-brand-500 mr-1.5"></span> MRR
+                                    </span>
+                                    <span class="flex items-center text-slate-300">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 mr-1.5"></span> New Expansion
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Canvas Chart Wrapper -->
+                            <div class="relative w-full h-64">
+                                <canvas id="revenue-chart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Live Activity Stream -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-5 flex flex-col shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-sm font-semibold text-white">Live Operations Feed</h3>
+                                <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">Realtime</span>
+                            </div>
+                            <div id="activity-feed" class="space-y-4 overflow-y-auto max-h-[260px] pr-1">
+                                <!-- Dynamic Activity Items populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk & Expansion Accounts Summary Widget -->
+                    <div class="bg-dark-card border border-dark-border rounded-xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">High Priority Account Watchlist</h3>
+                                <p class="text-xs text-slate-400">Accounts flagged for churn risk or immediate expansion opportunity</p>
+                            </div>
+                            <a href="#customers" data-view="customers" class="nav-link text-xs font-medium text-brand-400 hover:underline">View All Accounts &rarr;</a>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="overview-watchlist">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. CUSTOMERS / ACCOUNTS VIEW -->
+                <section id="view-customers" class="view-content space-y-6 hidden">
+                    <!-- Page Header & Actions -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Customer Accounts & ARR</h1>
+                            <p class="text-xs md:text-sm text-slate-400">Manage B2B contracts, health scores, and onboarding status.</p>
+                        </div>
+                        <button id="btn-add-customer-main" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-2 self-start sm:self-auto shadow-md transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            <span>Add New Customer</span>
+                        </button>
+                    </div>
+
+                    <!-- Filter Bar & Search -->
+                    <div class="bg-dark-card border border-dark-border rounded-xl p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                        <div class="flex-1 relative">
+                            <svg class="w-4 h-4 absolute left-3 top-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="text" id="customer-search-input" placeholder="Search by account name, domain, or owner..." class="w-full bg-slate-900 border border-dark-border text-white text-xs pl-9 pr-4 py-2.5 rounded-lg focus:outline-none focus:border-brand-500 transition">
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <!-- Plan Filter -->
+                            <select id="customer-plan-filter" class="bg-slate-900 border border-dark-border text-slate-300 text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-brand-500">
+                                <option value="ALL">All Plans</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Pro">Pro</option>
+                                <option value="Starter">Starter</option>
+                            </select>
+
+                            <!-- Status Filter -->
+                            <select id="customer-status-filter" class="bg-slate-900 border border-dark-border text-slate-300 text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-brand-500">
+                                <option value="ALL">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="At Risk">At Risk</option>
+                                <option value="Onboarding">Onboarding</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Customers Table -->
+                    <div class="bg-dark-card border border-dark-border rounded-xl overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-900/80 text-slate-400 font-semibold uppercase tracking-wider border-b border-dark-border">
+                                    <tr>
+                                        <th class="py-3.5 px-4">Account Name</th>
+                                        <th class="py-3.5 px-4">Plan Tier</th>
+                                        <th class="py-3.5 px-4">Annual ARR</th>
+                                        <th class="py-3.5 px-4">Health Score</th>
+                                        <th class="py-3.5 px-4">Status</th>
+                                        <th class="py-3.5 px-4">Account Lead</th>
+                                        <th class="py-3.5 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-tbody" class="divide-y divide-dark-border">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Empty State -->
+                        <div id="customers-empty-state" class="hidden p-12 text-center">
+                            <svg class="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            <h4 class="text-sm font-semibold text-white">No accounts match criteria</h4>
+                            <p class="text-xs text-slate-400 mt-1">Try adjusting your search query or filter settings.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PROJECTS & TASKS (KANBAN) VIEW -->
+                <section id="view-tasks" class="view-content space-y-6 hidden">
+                    <!-- Page Header & Actions -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Operations Kanban</h1>
+                            <p class="text-xs md:text-sm text-slate-400">Track implementation engineering, SLA tickets, and renewals.</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button id="btn-add-task-main" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center space-x-2 shadow-md transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                <span>New Task</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Filter Header -->
+                    <div class="flex flex-wrap items-center justify-between gap-3 bg-dark-card border border-dark-border p-3 rounded-xl">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-2">Priority:</span>
+                            <button data-task-prio="ALL" class="task-prio-btn px-2.5 py-1 rounded text-xs bg-brand-600 text-white font-medium">All</button>
+                            <button data-task-prio="High" class="task-prio-btn px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-800">High</button>
+                            <button data-task-prio="Medium" class="task-prio-btn px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-800">Medium</button>
+                            <button data-task-prio="Low" class="task-prio-btn px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-800">Low</button>
+                        </div>
+                        <div class="text-xs text-slate-400 font-mono">
+                            Total Items: <span id="kanban-total-count" class="text-white font-semibold">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Kanban Columns Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Column: Backlog -->
+                        <div class="bg-dark-card/60 border border-dark-border rounded-xl p-3 flex flex-col">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-dark-border px-1">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-slate-500 mr-2"></span> Backlog
+                                </span>
+                                <span id="count-backlog" class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">0</span>
+                            </div>
+                            <div id="col-backlog" class="kanban-col flex-1 space-y-3" data-status="Backlog"></div>
+                        </div>
+
+                        <!-- Column: In Progress -->
+                        <div class="bg-dark-card/60 border border-dark-border rounded-xl p-3 flex flex-col">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-dark-border px-1">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-brand-500 mr-2"></span> In Progress
+                                </span>
+                                <span id="count-in_progress" class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">0</span>
+                            </div>
+                            <div id="col-in_progress" class="kanban-col flex-1 space-y-3" data-status="In Progress"></div>
+                        </div>
+
+                        <!-- Column: In Review -->
+                        <div class="bg-dark-card/60 border border-dark-border rounded-xl p-3 flex flex-col">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-dark-border px-1">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span> In Review
+                                </span>
+                                <span id="count-in_review" class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">0</span>
+                            </div>
+                            <div id="col-in_review" class="kanban-col flex-1 space-y-3" data-status="In Review"></div>
+                        </div>
+
+                        <!-- Column: Completed -->
+                        <div class="bg-dark-card/60 border border-dark-border rounded-xl p-3 flex flex-col">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-dark-border px-1">
+                                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Completed
+                                </span>
+                                <span id="count-completed" class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">0</span>
+                            </div>
+                            <div id="col-completed" class="kanban-col flex-1 space-y-3" data-status="Completed"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. BILLING & PLANS VIEW -->
+                <section id="view-billing" class="view-content space-y-6 hidden">
+                    <!-- Page Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Billing & Subscriptions</h1>
+                            <p class="text-xs md:text-sm text-slate-400">Manage plan tiers, active usage meters, and download invoices.</p>
+                        </div>
+                        <!-- Monthly/Annual Toggle -->
+                        <div class="flex items-center bg-slate-900 border border-dark-border p-1 rounded-xl text-xs self-start sm:self-auto">
+                            <button id="billing-btn-monthly" class="px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition">Monthly</button>
+                            <button id="billing-btn-annual" class="px-4 py-1.5 rounded-lg bg-brand-600 text-white font-semibold shadow transition flex items-center space-x-1.5">
+                                <span>Annual</span>
+                                <span class="text-[10px] bg-emerald-400 text-slate-950 font-bold px-1.5 py-0.2 rounded-full">Save 20%</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Usage Meters Banner -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-4">
+                            <div class="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                                <span>API Rate Quota</span>
+                                <span class="font-mono text-white">842k / 1.0M</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-dark-border">
+                                <div class="bg-brand-500 h-full rounded-full" style="width: 84%"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2">Resets in 12 days</p>
+                        </div>
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-4">
+                            <div class="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                                <span>Team Seats</span>
+                                <span class="font-mono text-white">12 / 15 seats</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-dark-border">
+                                <div class="bg-indigo-400 h-full rounded-full" style="width: 80%"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2">3 available seats</p>
+                        </div>
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-4">
+                            <div class="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                                <span>Data Warehouse Storage</span>
+                                <span class="font-mono text-white">45.2 GB / 100 GB</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-dark-border">
+                                <div class="bg-emerald-400 h-full rounded-full" style="width: 45%"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500 mt-2">Optimized compression enabled</p>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                        <!-- Starter Plan -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-6 flex flex-col justify-between hover:border-slate-700 transition">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Starter Ops</span>
+                                <div class="mt-4 flex items-baseline">
+                                    <span class="text-3xl font-extrabold text-white font-mono" id="price-starter">$199</span>
+                                    <span class="text-xs text-slate-400 ml-1">/ month</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Ideal for early stage SaaS startups setting up telemetry.</p>
+                                <ul class="mt-6 space-y-3 text-xs text-slate-300">
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Up to 5 team seats
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Standard SLA & Helpdesk
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        50k API calls / month
+                                    </li>
+                                </ul>
+                            </div>
+                            <button class="btn-plan-select border border-dark-border hover:bg-slate-800 text-white w-full py-2.5 rounded-lg text-xs font-semibold mt-8 transition">
+                                Downgrade to Starter
+                            </button>
+                        </div>
+
+                        <!-- Pro Plan (ACTIVE) -->
+                        <div class="bg-dark-card border-2 border-brand-500 rounded-xl p-6 flex flex-col justify-between relative shadow-xl shadow-brand-500/10">
+                            <span class="absolute -top-3 right-6 bg-brand-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow">Current Plan</span>
+                            <div>
+                                <span class="text-xs font-semibold text-brand-400 uppercase tracking-wider">Pro Growth</span>
+                                <div class="mt-4 flex items-baseline">
+                                    <span class="text-3xl font-extrabold text-white font-mono" id="price-pro">$499</span>
+                                    <span class="text-xs text-slate-400 ml-1">/ month</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">For scaling B2B companies needing full workflow automation.</p>
+                                <ul class="mt-6 space-y-3 text-xs text-slate-300">
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Up to 15 team seats
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        1.0M API calls / month
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Real-time webhook sync
+                                    </li>
+                                </ul>
+                            </div>
+                            <button disabled class="bg-brand-600 text-white opacity-80 cursor-default w-full py-2.5 rounded-lg text-xs font-semibold mt-8 shadow transition">
+                                Active Subscription
+                            </button>
+                        </div>
+
+                        <!-- Enterprise Plan -->
+                        <div class="bg-dark-card border border-dark-border rounded-xl p-6 flex flex-col justify-between hover:border-slate-700 transition">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Scale Enterprise</span>
+                                <div class="mt-4 flex items-baseline">
+                                    <span class="text-3xl font-extrabold text-white font-mono" id="price-enterprise">$1,299</span>
+                                    <span class="text-xs text-slate-400 ml-1">/ month</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">Custom security compliance, dedicated TAM & audit logs.</p>
+                                <ul class="mt-6 space-y-3 text-xs text-slate-300">
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Unlimited team seats
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Dedicated Technical Account Manager
+                                    </li>
+                                    <li class="flex items-center">
+                                        <svg class="w-4 h-4 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        SOC2 & HIPAA Compliance exports
+                                    </li>
+                                </ul>
+                            </div>
+                            <button class="btn-plan-select bg-brand-600 hover:bg-brand-500 text-white w-full py-2.5 rounded-lg text-xs font-semibold mt-8 shadow transition">
+                                Upgrade to Enterprise
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Invoices History Table -->
+                    <div class="bg-dark-card border border-dark-border rounded-xl p-5 shadow-sm">
+                        <h3 class="text-sm font-semibold text-white mb-4">Past Billing Statements</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-300">
+                                <thead class="bg-slate-900 text-slate-400 uppercase font-semibold border-b border-dark-border">
+                                    <tr>
+                                        <th class="py-3 px-4">Invoice ID</th>
+                                        <th class="py-3 px-4">Billing Date</th>
+                                        <th class="py-3 px-4">Amount</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4 text-right">Receipt</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-dark-border">
+                                    <tr>
+                                        <td class="py-3.5 px-4 font-mono text-white">INV-2026-011</td>
+                                        <td class="py-3.5 px-4">Nov 01, 2026</td>
+                                        <td class="py-3.5 px-4 font-mono">$499.00</td>
+                                        <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-semibold">Paid</span></td>
+                                        <td class="py-3.5 px-4 text-right"><button onclick="showToast('Invoice INV-2026-011 PDF downloaded')" class="text-brand-400 hover:underline font-medium">Download PDF</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3.5 px-4 font-mono text-white">INV-2026-010</td>
+                                        <td class="py-3.5 px-4">Oct 01, 2026</td>
+                                        <td class="py-3.5 px-4 font-mono">$499.00</td>
+                                        <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-semibold">Paid</span></td>
+                                        <td class="py-3.5 px-4 text-right"><button onclick="showToast('Invoice INV-2026-010 PDF downloaded')" class="text-brand-400 hover:underline font-medium">Download PDF</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3.5 px-4 font-mono text-white">INV-2026-009</td>
+                                        <td class="py-3.5 px-4">Sep 01, 2026</td>
+                                        <td class="py-3.5 px-4 font-mono">$499.00</td>
+                                        <td class="py-3.5 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded text-[10px] font-semibold">Paid</span></td>
+                                        <td class="py-3.5 px-4 text-right"><button onclick="showToast('Invoice INV-2026-009 PDF downloaded')" class="text-brand-400 hover:underline font-medium">Download PDF</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. SETTINGS & TEAM VIEW -->
+                <section id="view-settings" class="view-content space-y-6 hidden">
+                    <!-- Page Header -->
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold text-white tracking-tight">Workspace Settings</h1>
+                        <p class="text-xs md:text-sm text-slate-400">Manage team access, profile credentials, and data persistence.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Settings Form -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <!-- Profile Form -->
+                            <div class="bg-dark-card border border-dark-border rounded-xl p-5 shadow-sm">
+                                <h3 class="text-sm font-semibold text-white mb-4">Workspace Details</h3>
+                                <form id="settings-profile-form" class="space-y-4">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-300 mb-1">Company / Workspace Name</label>
+                                            <input type="text" id="setting-company-name" value="Vantage Operations Inc." class="w-full bg-slate-900 border border-dark-border text-white text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-slate-300 mb-1">Custom Domain</label>
+                                            <input type="text" id="setting-domain" value="ops.vantage.io" class="w-full bg-slate-900 border border-dark-border text-white text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-medium text-slate-300 mb-1">Operations Contact Email</label>
+                                        <input type="email" id="setting-contact-email" value="ops-admin@vantage.io" class="w-full bg-slate-900 border border-dark-border text-white text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                                    </div>
+
+                                    <div class="pt-2">
+                                        <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition">
+                                            Save Settings
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Team Members List -->
+                            <div class="bg-dark-card border border-dark-border rounded-xl p-5 shadow-sm">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-sm font-semibold text-white">Team Members</h3>
+                                        <p class="text-xs text-slate-400">People with administrative rights to this workspace</p>
+                                    </div>
+                                    <button id="btn-modal-invite-team" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium border border-dark-border transition">
+                                        + Invite Member
+                                    </button>
+                                </div>
+                                <div id="team-members-list" class="space-y-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Preferences & Danger Zone -->
+                        <div class="space-y-6">
+                            <div class="bg-dark-card border border-dark-border rounded-xl p-5 shadow-sm">
+                                <h3 class="text-sm font-semibold text-white mb-3">Notification Preferences</h3>
+                                <div class="space-y-3 text-xs text-slate-300">
+                                    <label class="flex items-center justify-between cursor-pointer">
+                                        <span>Churn Risk Alerts</span>
+                                        <input type="checkbox" checked class="rounded border-slate-700 text-brand-600 focus:ring-0">
+                                    </label>
+                                    <label class="flex items-center justify-between cursor-pointer">
+                                        <span>Daily Revenue Digest</span>
+                                        <input type="checkbox" checked class="rounded border-slate-700 text-brand-600 focus:ring-0">
+                                    </label>
+                                    <label class="flex items-center justify-between cursor-pointer">
+                                        <span>Kanban Ticket Assignment</span>
+                                        <input type="checkbox" checked class="rounded border-slate-700 text-brand-600 focus:ring-0">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Reset Demo Data Card -->
+                            <div class="bg-red-950/20 border border-red-900/40 rounded-xl p-5">
+                                <h3 class="text-sm font-semibold text-red-400 mb-1">Reset Demo Data</h3>
+                                <p class="text-xs text-slate-400 mb-4">Restore default accounts, tasks, and initial metrics stored in `localStorage`.</p>
+                                <button id="btn-reset-data" class="bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 px-3 py-2 rounded-lg text-xs font-semibold w-full transition">
+                                    Reset All Demo Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- COMMAND PALETTE MODAL (CMD + K) -->
+    <div id="cmd-k-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4 hidden">
+        <div class="bg-dark-card border border-dark-border rounded-xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex items-center px-4 border-b border-dark-border">
+                <svg class="w-4 h-4 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input type="text" id="cmd-k-input" placeholder="Type a command or search customers & tasks..." class="w-full bg-transparent text-white text-sm py-3.5 focus:outline-none">
+                <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">ESC</span>
+            </div>
+            <div id="cmd-k-results" class="max-h-80 overflow-y-auto p-2 space-y-1 text-xs">
+                <!-- Dynamic Quick Actions & Search Results -->
+            </div>
+            <div class="px-4 py-2 bg-slate-900 border-t border-dark-border text-[11px] text-slate-500 flex justify-between">
+                <span>Navigate: <kbd class="font-mono text-slate-400">↑</kbd> <kbd class="font-mono text-slate-400">↓</kbd></span>
+                <span>Select: <kbd class="font-mono text-slate-400">↵</kbd></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD CUSTOMER MODAL -->
+    <div id="modal-customer" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-dark-border rounded-xl w-full max-w-md p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-dark-border">
+                <h3 class="text-sm font-bold text-white">Add New Account / Customer</h3>
+                <button class="btn-close-modal text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <form id="form-add-customer" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Company Name *</label>
+                    <input type="text" id="cust-name" required placeholder="e.g. Acme Corp" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Plan Tier</label>
+                        <select id="cust-plan" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                            <option value="Enterprise">Enterprise</option>
+                            <option value="Pro">Pro</option>
+                            <option value="Starter">Starter</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Annual ARR ($)</label>
+                        <input type="number" id="cust-arr" required value="48000" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Status</label>
+                        <select id="cust-status" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                            <option value="Active">Active</option>
+                            <option value="Onboarding">Onboarding</option>
+                            <option value="At Risk">At Risk</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Account Lead</label>
+                        <input type="text" id="cust-owner" value="Elena Rostova" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end space-x-2">
+                    <button type="button" class="btn-close-modal bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-semibold shadow">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADD TASK MODAL -->
+    <div id="modal-task" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-dark-card border border-dark-border rounded-xl w-full max-w-md p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center pb-2 border-b border-dark-border">
+                <h3 class="text-sm font-bold text-white">Create Operations Task</h3>
+                <button class="btn-close-modal text-slate-400 hover:text-white">&times;</button>
+            </div>
+            <form id="form-add-task" class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Task Title *</label>
+                    <input type="text" id="task-title" required placeholder="e.g. Configure SSO for Cyberdyne" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Associated Account</label>
+                    <input type="text" id="task-account" placeholder="e.g. Cyberdyne Systems" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Status Column</label>
+                        <select id="task-status" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                            <option value="Backlog">Backlog</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="In Review">In Review</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-medium mb-1">Priority</label>
+                        <select id="task-prio" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-slate-300 font-medium mb-1">Assignee</label>
+                    <input type="text" id="task-assignee" value="Marcus Vance" class="w-full bg-slate-900 border border-dark-border text-white px-3 py-2 rounded-lg">
+                </div>
+                <div class="pt-3 flex justify-end space-x-2">
+                    <button type="button" class="btn-close-modal bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-semibold shadow">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOMER DETAIL DRAWER -->
+    <div id="drawer-customer" class="fixed inset-y-0 right-0 w-full max-w-md bg-dark-card border-l border-dark-border shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 border-b border-dark-border flex items-center justify-between">
+            <h3 class="text-sm font-bold text-white">Account Workspace Detail</h3>
+            <button id="btn-close-drawer" class="text-slate-400 hover:text-white p-1">&times;</button>
+        </div>
+        <div id="drawer-customer-body" class="p-6 flex-1 overflow-y-auto space-y-6 text-xs">
+            <!-- Dynamic Customer Drawer Details -->
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION STACK -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+
+    <!-- VANILLA JAVASCRIPT LOGIC -->
+    <script>
+        // INITIAL MOCK DATA SEED
+        const INITIAL_DATA = {
+            customers: [
+                { id: 'c1', name: 'Cyberdyne Systems', plan: 'Enterprise', arr: 128000, health: 92, status: 'Active', owner: 'Elena Rostova', domain: 'cyberdyne.io' },
+                { id: 'c2', name: 'Stark Logistics', plan: 'Enterprise', arr: 96000, health: 48, status: 'At Risk', owner: 'Marcus Vance', domain: 'starklogistics.com' },
+                { id: 'c3', name: 'Acme Cloud Stack', plan: 'Pro', arr: 24000, health: 88, status: 'Active', owner: 'Sarah Chen', domain: 'acmecloud.dev' },
+                { id: 'c4', name: 'Wayne Enterprises', plan: 'Enterprise', arr: 154000, health: 95, status: 'Active', owner: 'Elena Rostova', domain: 'waynecorp.com' },
+                { id: 'c5', name: 'Omni Consumer Products', plan: 'Pro', arr: 18000, health: 32, status: 'At Risk', owner: 'Marcus Vance', domain: 'ocp.global' },
+                { id: 'c6', name: 'Haldron BioLab', plan: 'Starter', arr: 4800, health: 76, status: 'Onboarding', owner: 'Sarah Chen', domain: 'haldron.bio' },
+                { id: 'c7', name: 'Aperture Science', plan: 'Enterprise', arr: 88000, health: 91, status: 'Active', owner: 'Elena Rostova', domain: 'aperture.lab' },
+                { id: 'c8', name: 'Tyrell Synth', plan: 'Pro', arr: 36000, health: 64, status: 'Onboarding', owner: 'Marcus Vance', domain: 'tyrell.ai' }
+            ],
+            tasks: [
+                { id: 't1', title: 'Complete SOC2 Security Questionnaire', account: 'Cyberdyne Systems', status: 'In Progress', priority: 'High', assignee: 'Elena Rostova' },
+                { id: 't2', title: 'Resolve API Rate Limit Escalation', account: 'Stark Logistics', status: 'In Progress', priority: 'High', assignee: 'Marcus Vance' },
+                { id: 't3', title: 'Configure Custom SSO / SAML', account: 'Wayne Enterprises', status: 'Backlog', priority: 'Medium', assignee: 'Sarah Chen' },
+                { id: 't4', title: 'Schedule Q4 Quarterly Business Review', account: 'Aperture Science', status: 'In Review', priority: 'Low', assignee: 'Elena Rostova' },
+                { id: 't5', title: 'Execute Expansion Contract Amendment', account: 'Acme Cloud Stack', status: 'Completed', priority: 'High', assignee: 'Sarah Chen' },
+                { id: 't6', title: 'Investigation: Webhook Timeout Spikes', account: 'Omni Consumer Products', status: 'Backlog', priority: 'High', assignee: 'Marcus Vance' },
+                { id: 't7', title: 'Onboarding Kickoff Call', account: 'Haldron BioLab', status: 'Completed', priority: 'Low', assignee: 'Sarah Chen' }
+            ],
+            team: [
+                { id: 'm1', name: 'Elena Rostova', role: 'Head of Operations', email: 'elena@vantage.io', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80' },
+                { id: 'm2', name: 'Marcus Vance', role: 'Lead Solutions Architect', email: 'marcus@vantage.io', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80' },
+                { id: 'm3', name: 'Sarah Chen', role: 'Customer Success Manager', email: 'sarah@vantage.io', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80' }
+            ],
+            activities: [
+                { id: 'a1', type: 'upgrade', text: 'Stark Logistics upgraded to Enterprise Plan', time: '12 mins ago' },
+                { id: 'a2', type: 'risk', text: 'Omni Consumer Products health dropped below 35%', time: '1 hour ago' },
+                { id: 'a3', type: 'task', text: 'Marcus Vance completed SOC2 Questionnaire', time: '3 hours ago' },
+                { id: 'a4', type: 'new', text: 'New account Haldron BioLab signed up', time: '5 hours ago' }
+            ]
+        };
+
+        // GLOBAL APP STATE & PERSISTENCE
+        let state = {
+            customers: [],
+            tasks: [],
+            team: [],
+            activities: [],
+            currentView: 'overview',
+            taskPriorityFilter: 'ALL',
+            billingBillingCycle: 'annual'
+        };
+
+        // LOCAL STORAGE LOAD / SAVE
+        function loadState() {
+            try {
+                const savedCust = localStorage.getItem('vantage_customers');
+                const savedTasks = localStorage.getItem('vantage_tasks');
+                const savedTeam = localStorage.getItem('vantage_team');
+                const savedAct = localStorage.getItem('vantage_activities');
+
+                state.customers = savedCust ? JSON.parse(savedCust) : INITIAL_DATA.customers;
+                state.tasks = savedTasks ? JSON.parse(savedTasks) : INITIAL_DATA.tasks;
+                state.team = savedTeam ? JSON.parse(savedTeam) : INITIAL_DATA.team;
+                state.activities = savedAct ? JSON.parse(savedAct) : INITIAL_DATA.activities;
+            } catch (e) {
+                console.error('Error loading state from localStorage:', e);
+                state = { ...INITIAL_DATA };
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('vantage_customers', JSON.stringify(state.customers));
+                localStorage.setItem('vantage_tasks', JSON.stringify(state.tasks));
+                localStorage.setItem('vantage_team', JSON.stringify(state.team));
+                localStorage.setItem('vantage_activities', JSON.stringify(state.activities));
+            } catch (e) {
+                console.error('Error saving state:', e);
+            }
+        }
+
+        function resetAllData() {
+            localStorage.clear();
+            state.customers = [...INITIAL_DATA.customers];
+            state.tasks = [...INITIAL_DATA.tasks];
+            state.team = [...INITIAL_DATA.team];
+            state.activities = [...INITIAL_DATA.activities];
+            saveState();
+            renderAll();
+            showToast('All demo data has been reset to defaults.');
+        }
+
+        // TOAST SYSTEM
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center justify-between px-4 py-3 rounded-lg text-xs font-medium text-white shadow-xl transition-all duration-300 border transform translate-y-2 opacity-0 ${
+                type === 'error' ? 'bg-red-950 border-red-800' : 'bg-slate-900 border-dark-border'
+            }`;
+            
+            toast.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full ${type === 'error' ? 'bg-red-400' : 'bg-brand-400'}"></span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ROUTING & NAVIGATION
+        function switchView(viewName) {
+            state.currentView = viewName;
+            
+            // Hide all view sections
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            
+            // Show target view section
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) target.classList.remove('hidden');
+
+            // Update Nav link active styling
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const linkView = link.getAttribute('data-view');
+                if (linkView === viewName) {
+                    link.className = 'nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-white bg-brand-600/10 text-brand-400 border border-brand-500/20';
+                } else {
+                    link.className = 'nav-link flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition';
+                }
+            });
+
+            if (viewName === 'overview') {
+                renderRevenueChart();
+            }
+        }
+
+        // RENDERERS
+        function renderAll() {
+            renderOverview();
+            renderCustomers();
+            renderTasks();
+            renderTeam();
+            updateCounts();
+        }
+
+        function updateCounts() {
+            document.getElementById('nav-customer-count').innerText = state.customers.length;
+            document.getElementById('nav-task-count').innerText = state.tasks.filter(t => t.status !== 'Completed').length;
+        }
+
+        // 1. OVERVIEW RENDERER
+        function renderOverview() {
+            // Calculate total ARR
+            const totalArr = state.customers.reduce((acc, c) => acc + (c.arr || 0), 0);
+            document.getElementById('kpi-arr').innerText = `$${(totalArr / 1000).toFixed(0)}k`;
+
+            // Activity feed
+            const feed = document.getElementById('activity-feed');
+            feed.innerHTML = state.activities.map(act => `
+                <div class="flex items-start space-x-3 text-xs">
+                    <div class="w-2 h-2 rounded-full mt-1.5 shrink-0 ${act.type === 'risk' ? 'bg-red-400' : 'bg-brand-500'}"></div>
+                    <div class="flex-1">
+                        <p class="text-slate-300 leading-snug">${act.text}</p>
+                        <span class="text-[10px] text-slate-500 font-mono">${act.time}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Overview Watchlist (At Risk or High ARR)
+            const watchlist = document.getElementById('overview-watchlist');
+            const atRisk = state.customers.filter(c => c.status === 'At Risk' || c.health < 60).slice(0, 3);
+            watchlist.innerHTML = atRisk.map(c => `
+                <div class="bg-slate-900 border border-dark-border p-3 rounded-lg flex justify-between items-center">
+                    <div>
+                        <div class="font-semibold text-white text-xs">${c.name}</div>
+                        <div class="text-[10px] text-slate-400 font-mono">$${(c.arr / 1000).toFixed(0)}k ARR • ${c.owner}</div>
+                    </div>
+                    <span class="px-2 py-0.5 text-[10px] rounded font-semibold ${c.health < 50 ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400'}">
+                        Health ${c.health}%
+                    </span>
+                </div>
+            `).join('');
+
+            renderRevenueChart();
+        }
+
+        // CANVAS CHART ENGINE
+        function renderRevenueChart() {
+            const canvas = document.getElementById('revenue-chart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust canvas density
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Mock datasets
+            const dataPoints = [210, 245, 270, 310, 340, 390, 428];
+            const months = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            const padding = 30;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+
+            const maxVal = Math.max(...dataPoints) * 1.15;
+            const stepX = chartWidth / (dataPoints.length - 1);
+
+            // Gridlines
+            ctx.strokeStyle = 'rgba(31, 41, 61, 0.6)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 4; i++) {
+                const y = padding + (chartHeight / 3) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+
+            // Curve coordinates
+            const pts = dataPoints.map((val, idx) => {
+                const x = padding + idx * stepX;
+                const y = height - padding - (val / maxVal) * chartHeight;
+                return { x, y };
+            });
+
+            // Gradient Fill under curve
+            const fillGradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+            fillGradient.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+            fillGradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 0; i < pts.length - 1; i++) {
+                const xc = (pts[i].x + pts[i + 1].x) / 2;
+                const yc = (pts[i].y + pts[i + 1].y) / 2;
+                ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+            }
+            ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+            ctx.lineTo(pts[pts.length - 1].x, height - padding);
+            ctx.lineTo(pts[0].x, height - padding);
+            ctx.closePath();
+            ctx.fillStyle = fillGradient;
+            ctx.fill();
+
+            // Draw Curve Line
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 0; i < pts.length - 1; i++) {
+                const xc = (pts[i].x + pts[i + 1].x) / 2;
+                const yc = (pts[i].y + pts[i + 1].y) / 2;
+                ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+            }
+            ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw Points & Labels
+            pts.forEach((pt, i) => {
+                ctx.fillStyle = '#6366f1';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // X labels
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(months[i], pt.x, height - 10);
+            });
+        }
+
+        // 2. CUSTOMERS RENDERER & SEARCH
+        function renderCustomers() {
+            const tbody = document.getElementById('customers-tbody');
+            const searchVal = document.getElementById('customer-search-input').value.toLowerCase();
+            const planVal = document.getElementById('customer-plan-filter').value;
+            const statusVal = document.getElementById('customer-status-filter').value;
+
+            const filtered = state.customers.filter(c => {
+                const matchSearch = c.name.toLowerCase().includes(searchVal) || c.owner.toLowerCase().includes(searchVal);
+                const matchPlan = planVal === 'ALL' || c.plan === planVal;
+                const matchStatus = statusVal === 'ALL' || c.status === statusVal;
+                return matchSearch && matchPlan && matchStatus;
+            });
+
+            const emptyState = document.getElementById('customers-empty-state');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map(c => `
+                <tr class="hover:bg-slate-900/50 cursor-pointer transition" onclick="openCustomerDrawer('${c.id}')">
+                    <td class="py-3.5 px-4 font-semibold text-white flex items-center space-x-3">
+                        <div class="w-7 h-7 rounded bg-slate-800 border border-dark-border flex items-center justify-center font-mono text-[10px] text-brand-400">
+                            ${c.name.substring(0,2).toUpperCase()}
+                        </div>
+                        <div>
+                            <div>${c.name}</div>
+                            <div class="text-[10px] text-slate-500 font-normal font-mono">${c.domain || 'account.io'}</div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-medium ${c.plan === 'Enterprise' ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' : 'bg-slate-800 text-slate-300'}">
+                            ${c.plan}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 font-mono font-medium text-white">$${(c.arr || 0).toLocaleString()}</td>
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                <div class="h-full ${c.health > 75 ? 'bg-emerald-400' : c.health > 45 ? 'bg-amber-400' : 'bg-red-400'}" style="width: ${c.health}%"></div>
+                            </div>
+                            <span class="font-mono text-[11px] text-slate-400">${c.health}%</span>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            c.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' :
+                            c.status === 'At Risk' ? 'bg-red-500/10 text-red-400' : 'bg-brand-500/10 text-brand-400'
+                        }">
+                            ${c.status}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-400">${c.owner}</td>
+                    <td class="py-3.5 px-4 text-right" onclick="event.stopPropagation()">
+                        <button onclick="deleteCustomer('${c.id}')" class="text-slate-500 hover:text-red-400 p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 3. TASKS / KANBAN RENDERER
+        function renderTasks() {
+            const cols = {
+                'Backlog': document.getElementById('col-backlog'),
+                'In Progress': document.getElementById('col-in_progress'),
+                'In Review': document.getElementById('col-in_review'),
+                'Completed': document.getElementById('col-completed')
+            };
+
+            Object.values(cols).forEach(col => col ? col.innerHTML = '' : null);
+
+            let counts = { 'Backlog': 0, 'In Progress': 0, 'In Review': 0, 'Completed': 0 };
+
+            const prioFilter = state.taskPriorityFilter;
+            const filteredTasks = state.tasks.filter(t => prioFilter === 'ALL' || t.priority === prioFilter);
+
+            filteredTasks.forEach(task => {
+                if (counts[task.status] !== undefined) counts[task.status]++;
+                const targetCol = cols[task.status];
+                if (!targetCol) return;
+
+                const card = document.createElement('div');
+                card.className = 'bg-dark-card border border-dark-border p-3.5 rounded-xl hover:border-slate-600 transition shadow-sm space-y-2 cursor-pointer';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded ${
+                            task.priority === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                            task.priority === 'Medium' ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-400'
+                        }">${task.priority} Priority</span>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="moveTask('${task.id}', -1)" class="p-1 hover:bg-slate-800 rounded text-slate-400" title="Move Left">&larr;</button>
+                            <button onclick="moveTask('${task.id}', 1)" class="p-1 hover:bg-slate-800 rounded text-slate-400" title="Move Right">&rarr;</button>
+                        </div>
+                    </div>
+                    <h4 class="text-xs font-semibold text-white leading-snug">${task.title}</h4>
+                    <p class="text-[11px] text-slate-400 font-mono">${task.account}</p>
+                    <div class="pt-2 border-t border-dark-border/60 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>${task.assignee}</span>
+                        <button onclick="deleteTask('${task.id}')" class="text-slate-600 hover:text-red-400">&times;</button>
+                    </div>
+                `;
+                targetCol.appendChild(card);
+            });
+
+            document.getElementById('count-backlog').innerText = counts['Backlog'];
+            document.getElementById('count-in_progress').innerText = counts['In Progress'];
+            document.getElementById('count-in_review').innerText = counts['In Review'];
+            document.getElementById('count-completed').innerText = counts['Completed'];
+            document.getElementById('kanban-total-count').innerText = filteredTasks.length;
+        }
+
+        function moveTask(taskId, direction) {
+            const statuses = ['Backlog', 'In Progress', 'In Review', 'Completed'];
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task) return;
+            const idx = statuses.indexOf(task.status);
+            const newIdx = idx + direction;
+            if (newIdx >= 0 && newIdx < statuses.length) {
+                task.status = statuses[newIdx];
+                saveState();
+                renderTasks();
+                updateCounts();
+                showToast(`Task moved to ${task.status}`);
+            }
+        }
+
+        function deleteTask(taskId) {
+            state.tasks = state.tasks.filter(t => t.id !== taskId);
+            saveState();
+            renderTasks();
+            updateCounts();
+            showToast('Task deleted');
+        }
+
+        function deleteCustomer(custId) {
+            state.customers = state.customers.filter(c => c.id !== custId);
+            saveState();
+            renderCustomers();
+            renderOverview();
+            updateCounts();
+            showToast('Customer account removed');
+        }
+
+        // 4. TEAM RENDERER
+        function renderTeam() {
+            const container = document.getElementById('team-members-list');
+            container.innerHTML = state.team.map(m => `
+                <div class="flex items-center justify-between bg-slate-900 border border-dark-border p-3 rounded-xl">
+                    <div class="flex items-center space-x-3">
+                        <img class="w-8 h-8 rounded-full border border-dark-border object-cover" src="${m.avatar}" alt="${m.name}">
+                        <div>
+                            <div class="text-xs font-semibold text-white">${m.name}</div>
+                            <div class="text-[10px] text-slate-400">${m.role} • ${m.email}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">Admin</span>
+                </div>
+            `).join('');
+        }
+
+        // DRAWER FOR CUSTOMER DETAIL
+        function openCustomerDrawer(id) {
+            const cust = state.customers.find(c => c.id === id);
+            if (!cust) return;
+            const body = document.getElementById('drawer-customer-body');
+            body.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono text-brand-400">${cust.domain}</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${cust.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}">${cust.status}</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-white">${cust.name}</h2>
+                    
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <div class="bg-slate-900 p-3 rounded-lg border border-dark-border">
+                            <span class="text-slate-400 text-[10px]">Contract ARR</span>
+                            <div class="text-base font-bold text-white font-mono mt-0.5">$${(cust.arr || 0).toLocaleString()}</div>
+                        </div>
+                        <div class="bg-slate-900 p-3 rounded-lg border border-dark-border">
+                            <span class="text-slate-400 text-[10px]">Health Rating</span>
+                            <div class="text-base font-bold text-white font-mono mt-0.5">${cust.health}%</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-4 border-t border-dark-border">
+                        <h4 class="font-semibold text-white">Account Management</h4>
+                        <div class="text-slate-300">Account Owner: <span class="text-white font-medium">${cust.owner}</span></div>
+                        <div class="text-slate-300">Plan Tier: <span class="text-white font-medium">${cust.plan}</span></div>
+                    </div>
+
+                    <div class="pt-4 border-t border-dark-border space-y-2">
+                        <h4 class="font-semibold text-white">Associated Tasks</h4>
+                        ${state.tasks.filter(t => t.account === cust.name).map(t => `
+                            <div class="p-2 bg-slate-900 rounded border border-dark-border text-slate-300 text-[11px] flex justify-between">
+                                <span>${t.title}</span>
+                                <span class="text-slate-500 font-mono">${t.status}</span>
+                            </div>
+                        `).join('') || '<p class="text-slate-500 text-[11px]">No active tasks for this account.</p>'}
+                    </div>
+                </div>
+            `;
+            document.getElementById('drawer-customer').classList.remove('translate-x-full');
+        }
+
+        // COMMAND PALETTE LOGIC
+        function setupCommandPalette() {
+            const modal = document.getElementById('cmd-k-modal');
+            const input = document.getElementById('cmd-k-input');
+            const results = document.getElementById('cmd-k-results');
+
+            function openCmdK() {
+                modal.classList.remove('hidden');
+                input.value = '';
+                renderCmdKResults('');
+                input.focus();
+            }
+
+            function closeCmdK() {
+                modal.classList.add('hidden');
+            }
+
+            document.getElementById('cmd-k-trigger').addEventListener('click', openCmdK);
+            
+            window.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    openCmdK();
+                } else if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeCmdK();
+                }
+            });
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeCmdK();
+            });
+
+            input.addEventListener('input', (e) => {
+                renderCmdKResults(e.target.value.toLowerCase());
+            });
+
+            function renderCmdKResults(query) {
+                let html = '';
+
+                // Quick Navigation Commands
+                const navs = [
+                    { name: 'Go to Overview Dashboard', view: 'overview' },
+                    { name: 'Go to Customer Directory', view: 'customers' },
+                    { name: 'Go to Projects & Kanban', view: 'tasks' },
+                    { name: 'Go to Billing & Subscription', view: 'billing' },
+                    { name: 'Go to Workspace Settings', view: 'settings' }
+                ].filter(n => n.name.toLowerCase().includes(query));
+
+                if (navs.length) {
+                    html += `<div class="px-2 py-1 text-[10px] font-bold text-slate-500 uppercase">Navigation</div>`;
+                    navs.forEach(n => {
+                        html += `
+                            <div onclick="switchView('${n.view}'); document.getElementById('cmd-k-modal').classList.add('hidden');" class="px-3 py-2 rounded-lg hover:bg-brand-600 hover:text-white cursor-pointer text-slate-300 flex justify-between items-center transition">
+                                <span>${n.name}</span>
+                                <span class="text-[10px] opacity-60">Jump</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Matching Customers
+                const custs = state.customers.filter(c => c.name.toLowerCase().includes(query)).slice(0, 3);
+                if (custs.length) {
+                    html += `<div class="px-2 py-1 mt-2 text-[10px] font-bold text-slate-500 uppercase">Customers</div>`;
+                    custs.forEach(c => {
+                        html += `
+                            <div onclick="switchView('customers'); openCustomerDrawer('${c.id}'); document.getElementById('cmd-k-modal').classList.add('hidden');" class="px-3 py-2 rounded-lg hover:bg-brand-600 hover:text-white cursor-pointer text-slate-300 flex justify-between items-center transition">
+                                <span>${c.name} (${c.plan})</span>
+                                <span class="font-mono text-[10px] opacity-60">$${(c.arr/1000).toFixed(0)}k</span>
+                            </div>
+                        `;
+                    });
+                }
+
+                results.innerHTML = html || `<div class="p-4 text-center text-slate-500">No matching commands or accounts found.</div>`;
+            }
+        }
+
+        // EVENT LISTENERS BINDING
+        function bindEvents() {
+            // Navigation Links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const view = link.getAttribute('data-view');
+                    if (view) switchView(view);
+                });
+            });
+
+            // Timeframe Selector Buttons
+            document.querySelectorAll('.tf-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tf-btn').forEach(b => {
+                        b.className = 'tf-btn px-3 py-1 rounded-md text-slate-400 hover:text-white';
+                    });
+                    this.className = 'tf-btn px-3 py-1 rounded-md text-white bg-brand-600 font-semibold shadow';
+                    renderRevenueChart();
+                    showToast(`Metrics timeframe updated to ${this.innerText}`);
+                });
+            });
+
+            // Customer Filters & Search Input
+            document.getElementById('customer-search-input').addEventListener('input', renderCustomers);
+            document.getElementById('customer-plan-filter').addEventListener('change', renderCustomers);
+            document.getElementById('customer-status-filter').addEventListener('change', renderCustomers);
+
+            // Kanban Priority Buttons
+            document.querySelectorAll('.task-prio-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.task-prio-btn').forEach(b => b.className = 'task-prio-btn px-2.5 py-1 rounded text-xs text-slate-400 hover:bg-slate-800');
+                    this.className = 'task-prio-btn px-2.5 py-1 rounded text-xs bg-brand-600 text-white font-medium';
+                    state.taskPriorityFilter = this.getAttribute('data-task-prio');
+                    renderTasks();
+                });
+            });
+
+            // Modals Opening Triggers
+            document.querySelectorAll('#btn-modal-add-customer, #btn-add-customer-main').forEach(btn => {
+                btn?.addEventListener('click', () => document.getElementById('modal-customer').classList.remove('hidden'));
+            });
+
+            document.querySelectorAll('#btn-modal-add-task, #btn-add-task-main').forEach(btn => {
+                btn?.addEventListener('click', () => document.getElementById('modal-task').classList.remove('hidden'));
+            });
+
+            document.querySelectorAll('.btn-close-modal').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.getElementById('modal-customer').classList.add('hidden');
+                    document.getElementById('modal-task').classList.add('hidden');
+                });
+            });
+
+            // Close Drawer
+            document.getElementById('btn-close-drawer').addEventListener('click', () => {
+                document.getElementById('drawer-customer').classList.add('translate-x-full');
+            });
+
+            // Add Customer Form Submit
+            document.getElementById('form-add-customer').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newCust = {
+                    id: 'c_' + Date.now(),
+                    name: document.getElementById('cust-name').value,
+                    plan: document.getElementById('cust-plan').value,
+                    arr: parseInt(document.getElementById('cust-arr').value) || 0,
+                    health: 100,
+                    status: document.getElementById('cust-status').value,
+                    owner: document.getElementById('cust-owner').value,
+                    domain: document.getElementById('cust-name').value.toLowerCase().replace(/\s+/g, '') + '.io'
+                };
+                state.customers.unshift(newCust);
+                saveState();
+                renderAll();
+                document.getElementById('modal-customer').classList.add('hidden');
+                showToast(`Customer account "${newCust.name}" added successfully!`);
+                e.target.reset();
+            });
+
+            // Add Task Form Submit
+            document.getElementById('form-add-task').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newTask = {
+                    id: 't_' + Date.now(),
+                    title: document.getElementById('task-title').value,
+                    account: document.getElementById('task-account').value || 'Internal Ops',
+                    status: document.getElementById('task-status').value,
+                    priority: document.getElementById('task-prio').value,
+                    assignee: document.getElementById('task-assignee').value
+                };
+                state.tasks.unshift(newTask);
+                saveState();
+                renderTasks();
+                updateCounts();
+                document.getElementById('modal-task').classList.add('hidden');
+                showToast(`Task created!`);
+                e.target.reset();
+            });
+
+            // Profile Settings Submit
+            document.getElementById('settings-profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                showToast('Workspace profile preferences saved.');
+            });
+
+            // Reset Data Button
+            document.getElementById('btn-reset-data').addEventListener('click', resetAllData);
+
+            // Billing Cycle Switcher
+            document.getElementById('billing-btn-monthly').addEventListener('click', function() {
+                this.className = 'px-4 py-1.5 rounded-lg bg-brand-600 text-white font-semibold shadow transition';
+                document.getElementById('billing-btn-annual').className = 'px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition flex items-center space-x-1.5';
+                document.getElementById('price-starter').innerText = '$249';
+                document.getElementById('price-pro').innerText = '$599';
+                document.getElementById('price-enterprise').innerText = '$1,499';
+            });
+            document.getElementById('billing-btn-annual').addEventListener('click', function() {
+                this.className = 'px-4 py-1.5 rounded-lg bg-brand-600 text-white font-semibold shadow transition flex items-center space-x-1.5';
+                document.getElementById('billing-btn-monthly').className = 'px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition';
+                document.getElementById('price-starter').innerText = '$199';
+                document.getElementById('price-pro').innerText = '$499';
+                document.getElementById('price-enterprise').innerText = '$1,299';
+            });
+
+            // Quick Theme Toggle
+            document.getElementById('quick-theme-toggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                showToast('Theme mode toggled');
+            });
+
+            // Mobile Menu Toggle
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('inset-y-0');
+                sidebar.classList.toggle('left-0');
+            });
+
+            // Sidebar Collapse Button (Desktop)
+            document.getElementById('collapse-sidebar-btn').addEventListener('click', () => {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-20');
+            });
+
+            // Resize Handler for Canvas Chart
+            window.addEventListener('resize', () => {
+                if (state.currentView === 'overview') renderRevenueChart();
+            });
+        }
+
+        // INIT APP ON LOAD
+        window.onload = function() {
+            loadState();
+            bindEvents();
+            setupCommandPalette();
+            renderAll();
+        };
+    </script>
+</body>
+</html>
